@@ -80,17 +80,28 @@ function App() {
     );
   };
 
+  // Add these helper functions at the top of your App component
+  function getMaxTableId(tables) {
+    return Math.max(0, ...tables.map(table => table.id));
+  }
+
+  function getMaxTaskId(table) {
+    return Math.max(0, ...table.tasks.map(task => task.id));
+  }
+
+  // Modify handleAddTable
   const handleAddTable = () => {
     setTables([
       ...tables,
       {
-        id: tables.length + 1,
+        id: getMaxTableId(tables) + 1,
         name: "New Table",
         tasks: [],
       },
     ]);
   };
 
+  // Modify handleAddTask
   const handleAddTask = (tableId, taskData) => {
     setTables(
       tables.map((table) => {
@@ -100,7 +111,7 @@ function App() {
             tasks: [
               ...table.tasks,
               {
-                id: table.tasks.length + 1,
+                id: getMaxTaskId(table) + 1,
                 name: taskData.title,
                 time: taskData.time,
                 color: taskData.color,
