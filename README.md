@@ -89,9 +89,9 @@
 
 | Color     | Hex Code  | Preview                                                        |
 | --------- | --------- | -------------------------------------------------------------- |
-| Primary   | `#3e3240` | ![Primary](https://via.placeholder.com/15/3e3240/3e3240.png)   |
-| Secondary | `#322935` | ![Secondary](https://via.placeholder.com/15/322935/322935.png) |
-| Tertiary  | `#a988b5` | ![Tertiary](https://via.placeholder.com/15/a988b5/a988b5.png)  |
+| Primary   | `#3e3240` | ![Primary](https://img.shields.io/badge/Primary-%233e3240?style=for-the-badge&labelColor=3e3240)   |
+| Secondary | `#322935` | ![Secondary](https://img.shields.io/badge/Secondary-%23322935?style=for-the-badge&labelColor=322935) |
+| Tertiary  | `#a988b5` | ![Tertiary](https://img.shields.io/badge/Tertiary-%23a988b5?style=for-the-badge&labelColor=a988b5)  |
 
 </div>
 
