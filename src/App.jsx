@@ -10,6 +10,7 @@ import { IoMdSettings } from "react-icons/io";
 function App() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
+  const [taskModalState, setTaskModalState] = useState({ task: null, table: null });
   const [tables, setTables] = useState(() => {
     const storedTables = localStorage.getItem("tables");
     return storedTables
@@ -159,7 +160,7 @@ function App() {
                     <div
                       key={task.id}
                       className="flex h-fit w-full cursor-pointer flex-row items-start justify-between rounded bg-[var(--color-primary)] p-2 transition-all
-                        duration-300 hover:shadow-xl hover:brightness-110"
+                        duration-300 hover:shadow-xl"
                     >
                       <div className="flex flex-col min-w-0">
                         {task.color !== "" && (
@@ -176,10 +177,19 @@ function App() {
                       </div>
 
                       <div className="flex flex-col w-fit items-center justify-center gap-2">
-                        <BsThreeDots
-                          size={20}
-                          className="hover:bg-secondary rounded p-0.5 transition-all duration-300 hover:scale-110"
-                        />
+                        <div className="relative">
+                          <BsThreeDots
+                            size={20}
+                            className="hover:bg-secondary rounded p-0.5 transition-all duration-300 hover:scale-110"
+                            onClick={(e) => {
+                              setTaskModalState(
+                                taskModalState.task === task.id && taskModalState.table === table.id
+                                  ? { task: null, table: null }
+                                  : { task: task.id, table: table.id },
+                              );
+                            }}
+                          />
+                        </div>
                         <input
                           type="checkbox"
                           className="css-checkbox"
@@ -187,6 +197,14 @@ function App() {
                           onChange={() => handleCheckboxChange(table.id, task.id)}
                         />
                       </div>
+                      {taskModalState.task === task.id && taskModalState.table === table.id && (
+                        <div className="absolute translate-x-30 translate-y-5 z-50 w-32 rounded bg-[var(--color-secondary)] p-2 shadow-lg">
+                          <div className="flex flex-col gap-1">
+                            <button className="rounded p-1 text-sm hover:bg-[var(--color-primary)]">Edit</button>
+                            <button className="rounded p-1 text-sm hover:bg-[var(--color-primary)]">Delete</button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
