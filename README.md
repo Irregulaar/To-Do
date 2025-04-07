@@ -1,12 +1,41 @@
-# React + Vite
+# YourToDoo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern and elegant task management application built with React and Tailwind CSS.
 
-Currently, two official plugins are available:
+🌐 **Live Demo:** [yourtodoo.onrender.com](https://yourtodoo.onrender.com/)
+📦 **Repository:** [github.com/Irregulaar/To-Do](https://github.com/Irregulaar/To-Do)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![YourToDoo Preview](./public/preview.png)
 
-## Expanding the ESLint configuration
+## ✨ Features
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 📝 Multiple task boards support
+- 🎨 Customizable task colors
+- ✅ Task completion tracking
+- 📋 Task descriptions
+- 💾 Local storage persistence
+- 🎯 Clean and intuitive interface
+- 📱 Responsive design
+
+## 🛠️ Built With
+
+- React 19
+- Tailwind CSS
+- Vite
+- React Icons
+- Local Storage API
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm, pnpm or yarn
+
+### Installation
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/Irregulaar/To-Do.git
+```
