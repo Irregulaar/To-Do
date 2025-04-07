@@ -11,6 +11,7 @@ function App() {
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedTable, setSelectedTable] = useState(null);
   const [taskModalState, setTaskModalState] = useState({ task: null, table: null });
+  const [tableModalState, setTableModalState] = useState(null);
   const [tables, setTables] = useState(() => {
     const storedTables = localStorage.getItem("tables");
     return storedTables
@@ -42,11 +43,41 @@ function App() {
   });
 
   useEffect(() => {
-    saveTablesToLocalStorage(tables);
-  }, [tables]);
+    if (taskModalState.task !== null && tableModalState !== null) {
+      setTableModalState(null);
+    }
+  }, [taskModalState]);
+
+  useEffect(() => {
+    if (taskModalState.task !== null && tableModalState !== null) {
+      setTaskModalState({ task: null, table: null });
+    }
+  }, [tableModalState]);
 
   const saveTablesToLocalStorage = (data) => {
     localStorage.setItem("tables", JSON.stringify(data));
+  };
+
+  useEffect(() => {
+    saveTablesToLocalStorage(tables);
+  }, [tables]);
+
+  const handleDeleteTable = (tableId) => {
+    setTables(tables.filter((table) => table.id !== tableId));
+  };
+
+  const handleDeleteTask = (tableId, taskId) => {
+    setTables(
+      tables.map((table) => {
+        if (table.id === tableId) {
+          return {
+            ...table,
+            tasks: table.tasks.filter((task) => task.id !== taskId),
+          };
+        }
+        return table;
+      }),
+    );
   };
 
   const handleAddTable = () => {
@@ -124,7 +155,7 @@ function App() {
 
   return (
     <div className="custom-scrollbar relative h-screen w-screen overflow-x-auto overflow-y-hidden p-4 text-[var(--color-tertiary)]">
-      <div className="relative h-screen w-fit overflow-y-hidden p-0">
+      <div className="overflow-y-hidden relative p-0 h-screen w-fit">
         <p className="mb-3 text-2xl font-semibold">Welcome back to YourToDoo!</p>
         <div className="flex flex-row gap-2 pb-4">
           {/* START TABLE */}
@@ -142,19 +173,36 @@ function App() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter") e.target.blur();
                   }}
-                  className="text-1xl bg-transparent font-bold outline-none"
+                  className="font-bold bg-transparent outline-none text-1xl"
                 />
                 <BsThreeDots
                   size={20}
                   className="mr-2 cursor-pointer rounded transition-all duration-300 hover:scale-110 hover:bg-[var(--color-primary)]"
+                  onClick={() => setTableModalState(tableModalState === table.id ? null : table.id)}
                 />
+                {tableModalState === table.id && (
+                  <div className="absolute right-0 translate-y-6 z-50 w-32 rounded bg-[var(--color-secondary)] p-2 shadow-lg">
+                    <div className="flex flex-col gap-1">
+                      <button
+                        onClick={() => {
+                          handleDeleteTable(table.id);
+                          setTableModalState(null);
+                        }}
+                        className="p-1 text-sm font-semibold text-[var(--color-tertiary)] bg-[var(--color-primary)] rounded shadow-md transition-all duration-300
+                          cursor-pointer shadow-[var(--color-tertiary)]/50 hover:brightness-125"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <IoMdAdd
                   size={20}
                   onClick={() => openTaskModal(table.id)}
                   className="cursor-pointer rounded transition-all duration-300 hover:scale-110 hover:bg-[var(--color-primary)]"
                 />
               </div>
-              <div className="custom-scrollbar h-fit flex-1 overflow-y-auto p-2 pt-0">
+              <div className="overflow-y-auto flex-1 p-2 pt-0 custom-scrollbar h-fit">
                 <div className="flex flex-col gap-2">
                   {table.tasks.map((task) => (
                     <div
@@ -164,7 +212,7 @@ function App() {
                     >
                       <div className="flex flex-col min-w-0">
                         {task.color !== "" && (
-                          <div className="mb-1 h-2 w-15 rounded-full" style={{ backgroundColor: task.color }}></div>
+                          <div className="mb-1 h-2 rounded-full w-15" style={{ backgroundColor: task.color }}></div>
                         )}
 
                         <p className="text-[12px] font-semibold truncate">{task.name}</p>
@@ -176,7 +224,7 @@ function App() {
                         )}
                       </div>
 
-                      <div className="flex flex-col w-fit items-center justify-center gap-2">
+                      <div className="flex flex-col gap-2 justify-center items-center w-fit">
                         <div className="relative">
                           <BsThreeDots
                             size={20}
@@ -198,10 +246,24 @@ function App() {
                         />
                       </div>
                       {taskModalState.task === task.id && taskModalState.table === table.id && (
-                        <div className="absolute translate-x-30 translate-y-5 z-50 w-32 rounded bg-[var(--color-secondary)] p-2 shadow-lg">
+                        <div className="absolute translate-x-30 translate-y-6 z-50 w-32 rounded bg-[var(--color-secondary)] p-2 shadow-lg">
                           <div className="flex flex-col gap-1">
-                            <button className="rounded p-1 text-sm hover:bg-[var(--color-primary)]">Edit</button>
-                            <button className="rounded p-1 text-sm hover:bg-[var(--color-primary)]">Delete</button>
+                            <button
+                              className="p-1 text-sm font-semibold text-[var(--color-tertiary)] bg-[var(--color-primary)] rounded shadow-md transition-all duration-300
+                                cursor-pointer shadow-[var(--color-tertiary)]/50 hover:brightness-125"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => {
+                                handleDeleteTask(table.id, task.id);
+                                setTaskModalState({ task: null, table: null });
+                              }}
+                              className="p-1 text-sm font-semibold text-[var(--color-tertiary)] bg-[var(--color-primary)] rounded shadow-md transition-all duration-300
+                                cursor-pointer shadow-[var(--color-tertiary)]/50 hover:brightness-125"
+                            >
+                              Delete
+                            </button>
                           </div>
                         </div>
                       )}
@@ -215,7 +277,7 @@ function App() {
           {/* END TABLE */}
           <IoMdAdd
             size={30}
-            className="hover:bg-secondary cursor-pointer rounded transition-all duration-300 hover:scale-110"
+            className="rounded transition-all duration-300 cursor-pointer hover:bg-secondary hover:scale-110"
             onClick={handleAddTable}
           />
         </div>
@@ -279,7 +341,7 @@ function TaskCreateModal({ onClose, onSave }) {
 
   return (
     <div className="z-51 flex h-fit w-[90%] md:w-fit flex-col gap-2 bg-[var(--color-primary)] p-2">
-      <div className="w-full flex flex-row justify-between">
+      <div className="flex flex-row justify-between w-full">
         <p className="font-bold">Create task</p>
         <div
           onClick={onClose}
@@ -290,7 +352,7 @@ function TaskCreateModal({ onClose, onSave }) {
         </div>
       </div>
 
-      <div className="mb-3 h-px w-full self-center bg-white"></div>
+      <div className="self-center mb-3 w-full h-px bg-white"></div>
       <div className="flex flex-col gap-2">
         <p className="text-[14px]">Title</p>
         <div className="flex h-fit w-full flex-row justify-between gap-1 rounded bg-[var(--color-secondary)] p-1">
@@ -373,7 +435,7 @@ function TaskCreateModal({ onClose, onSave }) {
           </div>
         )}
 
-        <div className="mb-3 h-px w-full self-center bg-white"></div>
+        <div className="self-center mb-3 w-full h-px bg-white"></div>
         <div
           onClick={handleSave}
           className="flex flex-row items-center justify-center gap-2 rounded bg-[var(--color-tertiary)] p-1 text-[10px] text-[var(--color-secondary)]
