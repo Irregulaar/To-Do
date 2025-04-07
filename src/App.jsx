@@ -5,7 +5,7 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { BsThreeDots } from "react-icons/bs";
 import { FaCheck } from "react-icons/fa";
 import { FaMinus } from "react-icons/fa6";
-import { use } from "react";
+import { IoMdSettings } from "react-icons/io";
 
 function App() {
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -123,8 +123,8 @@ function App() {
 
   return (
     <div className="custom-scrollbar relative h-screen w-screen overflow-x-auto overflow-y-hidden p-4 text-[var(--color-tertiary)]">
-      <div className="relative h-screen w-fit overflow-y-hidden p-4">
-        <p className="mb-5 text-3xl font-bold">Welcome back!</p>
+      <div className="relative h-screen w-fit overflow-y-hidden p-0">
+        <p className="mb-3 text-2xl font-semibold">Welcome back to YourToDoo!</p>
         <div className="flex flex-row gap-2 pb-4">
           {/* START TABLE */}
           {tables.map((table) => (
@@ -202,9 +202,9 @@ function App() {
           />
         </div>
       </div>
-      <footer className="fixed right-0 bottom-0 left-0 z-10 w-screen p-4 text-center text-[10px]">
-        <p>
-          Made with ❤️ by{" "}
+      <footer className="fixed right-0 bottom-0 left-0 w-screen p-4 flex flex-row justify-center items-center text-center text-[10px] pointer-events-none">
+        <p className="ml-auto pointer-events-auto">
+          Created with ❤️ by{" "}
           <a
             target="_blank"
             rel="noopener noreferrer"
@@ -215,6 +215,10 @@ function App() {
           </a>{" "}
           on github
         </p>
+        <IoMdSettings
+          size={30}
+          className="ml-auto bg-[var(--color-secondary)] p-1 rounded hover:scale-110 transition-all duration-300 cursor-pointer pointer-events-auto"
+        />
       </footer>
 
       {isOpenModal && (
