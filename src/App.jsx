@@ -202,7 +202,7 @@ function App() {
           />
         </div>
       </div>
-      <footer className="fixed right-0 bottom-0 left-0 -z-10 w-screen p-4 text-center text-[10px]">
+      <footer className="fixed right-0 bottom-0 left-0 z-10 w-screen p-4 text-center text-[10px]">
         <p>
           Made with ❤️ by{" "}
           <a
