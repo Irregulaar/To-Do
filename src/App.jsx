@@ -260,7 +260,7 @@ function App() {
                         )}
                       </div>
 
-                      <div className="flex flex-col gap-2 justify-center items-center w-fit">
+                      <div className="flex flex-col gap-2 justify-center items-center w-fit" onClick={(e) => e.stopPropagation()}>
                         <div className="relative">
                           <BsThreeDots
                             size={20}
@@ -279,7 +279,10 @@ function App() {
                           type="checkbox"
                           className="css-checkbox"
                           checked={task.checkbox}
-                          onChange={() => handleCheckboxChange(table.id, task.id)}
+                          onChange={(e) => {
+                            e.stopPropagation();
+                            handleCheckboxChange(table.id, task.id);
+                          }}
                         />
                       </div>
                       {taskModalState.task === task.id && taskModalState.table === table.id && (
