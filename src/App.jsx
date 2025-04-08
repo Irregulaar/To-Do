@@ -12,6 +12,8 @@ function App() {
   const [selectedTable, setSelectedTable] = useState(null);
   const [taskModalState, setTaskModalState] = useState({ task: null, table: null });
   const [tableModalState, setTableModalState] = useState(null);
+  const [taskInfoOpen, setTaskInfoOpen] = useState(false);
+  const [taskInfoOpenId, setTaskInfoOpenId] = useState({ task: null, table: null });
   const [tables, setTables] = useState(() => {
     const storedTables = localStorage.getItem("tables");
     return storedTables
@@ -62,6 +64,25 @@ function App() {
     saveTablesToLocalStorage(tables);
   }, [tables]);
 
+  const handleTaskUpdate = (tableId, taskId, updatedTask) => {
+    setTables(
+      tables.map((table) => {
+        if (table.id === tableId) {
+          return {
+            ...table,
+            tasks: table.tasks.map((task) => {
+              if (task.id === taskId) {
+                return updatedTask;
+              }
+              return task;
+            }),
+          };
+        }
+        return table;
+      }),
+    );
+  };
+
   const handleDeleteTable = (tableId) => {
     setTables(tables.filter((table) => table.id !== tableId));
   };
@@ -82,11 +103,11 @@ function App() {
 
   // Add these helper functions at the top of your App component
   function getMaxTableId(tables) {
-    return Math.max(0, ...tables.map(table => table.id));
+    return Math.max(0, ...tables.map((table) => table.id));
   }
 
   function getMaxTaskId(table) {
-    return Math.max(0, ...table.tasks.map(task => task.id));
+    return Math.max(0, ...table.tasks.map((task) => task.id));
   }
 
   // Modify handleAddTable
@@ -218,6 +239,10 @@ function App() {
                   {table.tasks.map((task) => (
                     <div
                       key={task.id}
+                      onClick={() => {
+                        setTaskInfoOpenId({ task: task, table: table });
+                        setTaskInfoOpen(true);
+                      }}
                       className="flex h-fit w-full cursor-pointer flex-row items-start justify-between rounded bg-[var(--color-primary)] p-2 transition-all
                         duration-300 hover:shadow-xl"
                     >
@@ -239,8 +264,9 @@ function App() {
                         <div className="relative">
                           <BsThreeDots
                             size={20}
-                            className="hover:bg-secondary rounded p-0.5 transition-all duration-300 hover:scale-110"
+                            className="hover:bg-secondary rounded p-0.5 transition-all duration-300 hover:scale-110 z-10"
                             onClick={(e) => {
+                              e.stopPropagation();
                               setTaskModalState(
                                 taskModalState.task === task.id && taskModalState.table === table.id
                                   ? { task: null, table: null }
@@ -260,13 +286,8 @@ function App() {
                         <div className="absolute translate-x-30 translate-y-6 z-50 w-32 rounded bg-[var(--color-secondary)] p-2 shadow-lg">
                           <div className="flex flex-col gap-1">
                             <button
-                              className="p-1 text-sm font-semibold text-[var(--color-tertiary)] bg-[var(--color-primary)] rounded shadow-md transition-all duration-300
-                                cursor-pointer shadow-[var(--color-tertiary)]/50 hover:brightness-125"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 handleDeleteTask(table.id, task.id);
                                 setTaskModalState({ task: null, table: null });
                               }}
@@ -311,10 +332,135 @@ function App() {
           className="ml-auto bg-[var(--color-secondary)] p-1 rounded hover:scale-110 transition-all duration-300 cursor-pointer pointer-events-auto"
         />
       </footer>
-
       {isOpenModal && (
         <div className="fixed inset-0 z-50 flex h-screen w-full items-center justify-center bg-[#00000050]">
           <TaskCreateModal onClose={() => setIsOpenModal(false)} onSave={(TaskData) => handleAddTask(selectedTable, TaskData)} />
+        </div>
+      )}
+      {taskInfoOpen && (
+        <div className="fixed inset-0 z-50 flex h-screen w-full items-center justify-center bg-[#00000050]">
+          <TaskInfoModal
+            onClose={() => {
+              setTaskInfoOpen(false);
+              setTaskInfoOpenId({ task: null, table: null });
+            }}
+            onSave={(TaskData) => handleTaskUpdate(taskInfoOpenId.table.id, taskInfoOpenId.task.id, TaskData)}
+            TableInfo={taskInfoOpenId.table}
+            TaskInfo={taskInfoOpenId.task}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TaskInfoModal({ onClose, onSave, TableInfo, TaskInfo }) {
+  const [colorOpen, setColorOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [color, setColor] = useState(TaskInfo.color);
+
+  const [title, setTitle] = useState(TaskInfo.name);
+  const [description, setDescription] = useState(TaskInfo.description);
+  const [time, setTime] = useState(TaskInfo.time);
+
+  const Colors = [
+    "#FF5252", // Rojo
+    "#FF9800", // Naranja
+    "#FFEB3B", // Amarillo
+    "#4CAF50", // Verde
+    "#2196F3", // Azul
+    "#9C27B0", // Púrpura
+    "#795548", // Marrón
+    "#607D8B", // Gris azulado
+    "#E91E63", // Rosa
+    "#00BCD4", // Cian
+    "#673AB7", // Violeta
+    "#3F51B5", // Índigo
+  ];
+
+  const handleSave = () => {
+    onSave({
+      ...TaskInfo, // Mantener todos los datos originales
+      name: title, // Actualizar solo los campos modificados
+      description: description,
+      time: time,
+      color: color,
+    });
+  };
+
+  useEffect(() => {
+    if (title !== TaskInfo.name || description !== TaskInfo.description || time !== TaskInfo.time || color !== TaskInfo.color) {
+      handleSave();
+    }
+  }, [color, title, description, time]);
+
+  return (
+    <div className="z-51 flex h-fit w-[90%] md:w-fit flex-col gap-2 bg-[var(--color-primary)] p-2">
+      <div className="flex flex-row gap-20 justify-between w-full">
+        <p className="font-bold">{TableInfo.name}</p>
+        <div
+          onClick={onClose}
+          className="flex flex-row items-center justify-center gap-2 rounded bg-[var(--color-tertiary)] p-1 text-[10px] text-[var(--color-secondary)]
+            cursor-pointer hover:brightness-125 transition-all duration-300"
+        >
+          Close
+        </div>
+      </div>
+      <div className="self-center mb-3 w-full h-px bg-white"></div>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-row gap-2 justify-center items-center">
+          <textarea
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full min-h-[30px] p-2 resize-none rounded bg-[var(--color-secondary)] outline-none"
+          />
+        </div>
+        <div className="w-[20%] h-2 rounded" style={{ backgroundColor: color }}></div>
+        <p className="text-[14px]">Description</p>
+
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full h-32 p-2 resize-none rounded bg-[var(--color-secondary)] outline-none"
+        />
+      </div>
+      {!colorOpen ? (
+        <div
+          onClick={() => setColorOpen(!colorOpen)}
+          className="cursor-pointer hover:brightness-125 transition-all duration-300 flex flex-row items-center justify-center gap-1 rounded
+            bg-[var(--color-tertiary)] p-1 text-[10px] text-[var(--color-secondary)]"
+        >
+          <IoMdAdd size={15} />
+          Add color or change
+        </div>
+      ) : (
+        <div className="flex flex-row flex-wrap gap-2 justify-center items-center">
+          {Colors.map((color, index) => (
+            <div
+              key={index}
+              className="cursor-pointer w-5 h-5 items-center justify-center flex gap-2 rounded bg-[var(--color-tertiary)] p-1 text-[10px]
+                text-[var(--color-secondary)] hover:scale-105"
+              style={{ backgroundColor: color }}
+              onClick={() => {
+                setColor(color);
+                setSelectedColor(index);
+              }}
+            >
+              {selectedColor === index && <FaCheck size={10} className="text-[var(--color-primary)] text-center" />}
+            </div>
+          ))}
+          <div
+            onClick={() => {
+              setColorOpen(!colorOpen);
+              setSelectedColor(null);
+              setColor("");
+            }}
+            className="cursor-pointer hover:brightness-125 transition-all duration-300 flex flex-row items-center justify-center gap-1 rounded
+              bg-[var(--color-tertiary)] p-1 text-[10px] text-[var(--color-secondary)]"
+          >
+            <FaMinus size={15} />
+            Remove colors
+          </div>
         </div>
       )}
     </div>
